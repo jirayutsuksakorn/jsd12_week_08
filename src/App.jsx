@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import Castle from "./components/01_Castle";
 import rayquazaBg from "./assets/thumb-1920-1039168.png";
-import SpaceGame from "./SpaceGame"; // เพิ่มบรรทัดนี้
+import SpaceGame from "./Spacegame"; // เพิ่มบรรทัดนี้
 
 export default function App() {
   const [question, setQuestion] = useState("");
