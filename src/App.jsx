@@ -1,54 +1,7 @@
-// import { useState } from "react";
-// import Castle from "./components/01_Castle";
-// import SimpleAsyncAwait from "./example/SimpleAsyncAwait";
-
-// export default function App() {
-//   //creating state viarable
-//   const [question, setQuestion] = useState("");
-//   const [answer, setAnswer] = useState("");
-
-//   const handleQuestion = (e) => {
-//     console.log(e);
-//     setQuestion(e.target.value);
-//   }
-
-//   const handleAnswer = (e) => {
-//     console.log(e);
-//     setAnswer(e.target.value);
-//   }
-
-
-//   return (
-//     <div className="pb-80 py-10 gap-y-4 flex flex-col justify-center items-center min-h-screen bg-gray-800 text-white">
-//       <p className="text-purple-300">Message for JSD12:
-//         <span className="text-yellow-300">
-//           {/*question or waiting for a message*/}
-//           {question ? question : "Waiting for a message..."}
-//         </span>
-//       </p>
-//       <textarea
-//         value={question}
-//         onChange={handleQuestion}
-//         className="bg-white text-black rounded px-2 py-1" placeholder="Type your message here..." />
-//       <p className="text-green-300 text-2xl">
-//         Reply from secret room:
-//         <span className="text-yellow-300 ">
-//           {/* answer or waiting for a reply */}
-//           {answer ? answer : "Waiting for a reply..."}
-//         </span>
-//       </p>
-//       <Castle question={question} answer={answer} handleAnswer={handleAnswer} />
-//       <SimpleAsyncAwait />
-//     </div>
-//   );
-// }
-
-
-
-
 import { useState, useEffect, useRef } from "react";
 import Castle from "./components/01_Castle";
 import rayquazaBg from "./assets/thumb-1920-1039168.png";
+import SpaceGame from "./SpaceGame"; // เพิ่มบรรทัดนี้
 
 export default function App() {
   const [question, setQuestion] = useState("");
@@ -56,6 +9,8 @@ export default function App() {
   const [helpedPokemon, setHelpedPokemon] = useState([]);
   const [isAppearing, setIsAppearing] = useState(false);
   const [isAudioReady, setIsAudioReady] = useState(false);
+  const [isSpaceMode, setIsSpaceMode] = useState(false); // เพิ่มบรรทัดนี้ไว้ใต้ State อื่นๆ
+
 
   // ใช้ useRef เพื่อควบคุม Audio Object ให้เสถียรขึ้น
   const bgMusicRef = useRef(null);
@@ -143,6 +98,16 @@ export default function App() {
     };
   };
 
+  useEffect(() => {
+    if (isSpaceMode) {
+      bgMusicRef.current?.pause(); // หยุดเพลงหน้าหลักเมื่อเข้าเกม
+    } else {
+      if (isAudioReady) {
+        bgMusicRef.current?.play().catch(() => { }); // เล่นต่อเมื่อกลับมาหน้าหลัก
+      }
+    }
+  }, [isSpaceMode, isAudioReady]);
+
   return (
     <div className="relative min-h-screen w-full flex flex-col items-center justify-center overflow-hidden font-sans" style={getDynamicBackground()}>
       {!isAudioReady ? (
@@ -168,6 +133,13 @@ export default function App() {
             Pokemon Rescue
           </h1>
 
+          <button
+            onClick={() => setIsSpaceMode(true)}
+            className="fixed top-5 right-5 z-[150] bg-cyan-500 text-white px-8 py-3 rounded-full font-black shadow-[0_0_20px_rgba(6,182,212,0.5)] hover:scale-110 transition-all"
+          >
+            LAUNCH SPACE MISSION 🚀
+          </button>
+
           <div className="flex flex-wrap justify-center gap-10 min-h-[250px] mb-12">
             {helpedPokemon.map((p, i) => (
               <div key={i} className={`flex flex-col items-center transition-all duration-700 ${isAppearing ? 'scale-110 opacity-100' : 'scale-0 opacity-0'}`} style={{ transitionDelay: `${i * 100}ms` }}>
@@ -191,6 +163,12 @@ export default function App() {
             <Castle question={question} answer={answer} setAnswer={setAnswer} />
           </div>
         </div>
+      )}
+      {isSpaceMode && (
+        <SpaceGame
+          onBack={() => setIsSpaceMode(false)}
+          characterImg={helpedPokemon[0]?.img || "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png"}
+        />
       )}
     </div>
   );
