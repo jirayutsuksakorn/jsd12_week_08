@@ -5,6 +5,7 @@ import {
     doc, deleteDoc, serverTimestamp
 } from "firebase/firestore";
 import Boss from './Boss';
+import Leaderboard from './Leaderboard'; // เพิ่มบรรทัดนี้
 
 // --- Assets ---
 const spaceBgm = new Audio("https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3?filename=8-bit-background-music-for-arcade-game-come-on-mario-164702.mp3");
@@ -139,6 +140,7 @@ export default function SpaceGame({ onBack }) {
             await addDoc(collection(db, "scores"), {
                 name: playerName.toUpperCase(),
                 score: scoreRef.current,
+                hero: selectedHero.name,
                 timestamp: serverTimestamp()
             });
             fetchGlobalScores();
@@ -327,15 +329,7 @@ export default function SpaceGame({ onBack }) {
 
                 <div className="relative z-10 flex flex-col items-center">
                     <h2 className="text-4xl font-black mb-10 text-cyan-400 italic drop-shadow-[0_0_15px_rgba(34,211,238,0.5)]">POKE SHOOTER</h2>
-                    <div className="w-full max-w-md bg-white/5 border border-white/10 rounded-2xl p-6 mb-8 backdrop-blur-sm">
-                        <h3 className="text-center text-yellow-400 mb-4 uppercase font-bold tracking-widest text-xs">Top Pilot</h3>
-                        {globalLeaderboard.map((u, i) => (
-                            <div key={i} className="flex justify-between py-1 border-b border-white/5 last:border-0 text-sm">
-                                <span className="text-white/60">{i + 1}. {u.name}</span>
-                                <span className="text-cyan-400 font-bold">{u.score?.toLocaleString()}</span>
-                            </div>
-                        ))}
-                    </div>
+                    <Leaderboard scores={globalLeaderboard} fighters={fighters} />
                     <input type="text" maxLength={10} value={playerName} onChange={(e) => setPlayerName(e.target.value.toUpperCase())}
                         className="bg-transparent border-b-2 border-cyan-500 text-center text-2xl font-bold w-64 outline-none mb-10" placeholder="NAME" />
                     <div className="grid grid-cols-3 gap-4 mb-10">
